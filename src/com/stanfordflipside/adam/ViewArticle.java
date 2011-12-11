@@ -1,6 +1,7 @@
 package com.stanfordflipside.adam;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -44,6 +45,21 @@ public class ViewArticle extends Activity {
 		webView.getSettings().setLoadWithOverviewMode(true);
 		webView.getSettings().setUseWideViewPort(true);
 
+		final ProgressDialog dialog;
+		
+		int stringId=R.string.Loading;
+		String message=getString(stringId);
+		dialog=ProgressDialog.show(ViewArticle.this, "", message, true);
+		dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		dialog.setCancelable(false);
+		
+		webView.setWebViewClient(new WebViewClient() {
+
+			   public void onPageFinished(WebView view, String url) {
+			        dialog.dismiss();
+			    }
+			});
+		
 		webView.loadUrl(url);
 
 
