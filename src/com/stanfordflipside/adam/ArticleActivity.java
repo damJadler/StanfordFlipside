@@ -127,23 +127,24 @@ public class ArticleActivity extends ListActivity {
 		String articleType=nameList[(int) (rowId*NUM_ELEMENTS+TYPE_OFFSET)];
 		if(articleType.equals("Video"))
 		{
-			String youTubeURL=getFullLink("http://www.youtube.com/embed/");
+			String youTubeURL=getFullLink(url, "http://www.youtube.com/embed/", "\" frameborder=\"0\"");
+			 Uri parsed=Uri.parse("http://www.youtube.com/v/"+youTubeURL);		   
+			   startActivity(new Intent(Intent.ACTION_VIEW, parsed));
 		}
-		
-		 Uri parsed=Uri.parse(String.format("http://www.youtube.com/v/%s", url.substring("vnd.youtube:".length(),n)));		   
-		   startActivity(new Intent(Intent.ACTION_VIEW, parsed));
-		
+		else		
+		{
 		Intent intent=new Intent(this, ViewArticle.class);
 		
 		intent.putExtra(ARTICLE_SELECTED, url);
 		startActivity(intent);
+		}
 	}
 	
 	
-private String getFullLink(String urlStart, urlStop) {
+private String getFullLink(String url, String urlStart, String urlStop) {
 		// TODO Auto-generated method stub
 	InputStream is = null;
-	String result = "";
+	
 	//http post
 	try{
 		HttpClient httpclient = new DefaultHttpClient();
@@ -171,13 +172,13 @@ private String getFullLink(String urlStart, urlStop) {
 		int stopIndex=sb.indexOf(urlStop);
 		
 		String identifier=sb.substring(startIndex+urlStart.length(), stopIndex);
+		return identifier;
 		
-		result=sb.toString();
 		
 	}catch(Exception e){
 		Log.e("log_tag", "Error converting result "+e.toString());
 	}
-	
+		return null;
 	}
 
 //I found the skeleton of this method on an online help site (I think StackOverflow, but I can't remember
