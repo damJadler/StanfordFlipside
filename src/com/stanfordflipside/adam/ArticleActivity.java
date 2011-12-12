@@ -18,7 +18,9 @@ import org.json.JSONObject;
 
 import android.app.ListActivity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,9 +28,11 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class ArticleActivity extends ListActivity {
 
@@ -36,7 +40,7 @@ public class ArticleActivity extends ListActivity {
 	JSONObject json;
 
 	boolean indicator;
-	
+	public static final String TAG="TAG";
 	public static final int NUM_ELEMENTS=4;
 	public static final int ID_OFFSET=0;
 	public static final int TITLE_OFFSET=1;
@@ -45,25 +49,30 @@ public class ArticleActivity extends ListActivity {
 	public static final String ARTICLE_SELECTED="articleSelected";
 	public String[]nameList;
 	public int nameSize;
+	public DownloadTask downloader;
 	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		
+		
+		
+		nameSize=0;
 
 		/*indicator=false;
-		DownloadTask downloader=new DownloadTask();
+		downloader=new DownloadTask();
 		downloader.execute(null, null, null);*/
 		
 
 		json=getJSONfromURL("http://stanfordflipside.com/iphone-feed");
 		
-		nameSize=0;
+		
 
 
 		//while(indicator==false)
-			//;
+		//;
 
 		try{
 			//Get the element that holds the earthquakes ( JSONArray )
@@ -112,12 +121,16 @@ public class ArticleActivity extends ListActivity {
 		{
 			actualArray[x]=nameList[x*NUM_ELEMENTS+TITLE_OFFSET];
 		}
+		
 		ListAdapter adapter=new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, actualArray);
+		//ListAdapter adapter=new ArrayAdapter<String>(this, R.layout.simplerowlayout, android.R.id.text1, actualArray);
+		//ListAdapter adapter=new MyArrayAdapter<String>(this, android.R.layout.simple_list_item_1, actualArray);
 		setListAdapter(adapter);
 
 
 	}
 	
+		
 	protected void onListItemClick(ListView l, View v, int position, long rowId) {
 		super.onListItemClick(l, v, position, rowId);
 		
@@ -228,6 +241,25 @@ private String getFullLink(String url, String urlStart, String urlStop) {
 	}
 		
 
+	private class MyArrayAdapter<T> extends ArrayAdapter
+	{
+
+		public MyArrayAdapter(Context context, int textViewResourceId,
+				Object[] objects) {
+			super(context, textViewResourceId, objects);
+			
+		}
+		
+		public View getView(int position, View convertView, ViewGroup parent) {
+			  TextView tv = (TextView) super.getView(position, convertView, parent);
+			  tv.setTextColor(Color.BLACK);
+			return tv;
+		
+	}
+	}
+	
+	
+	
 	private class DownloadTask extends AsyncTask<Void, Void, Integer>
 	{
 
@@ -235,6 +267,7 @@ private String getFullLink(String url, String urlStart, String urlStop) {
 
 		protected void onPreExecute()
 		{
+			
 			int stringId=R.string.Loading;
 			String message=getString(stringId);
 			dialog=ProgressDialog.show(ArticleActivity.this, "", message, true);
@@ -254,6 +287,7 @@ private String getFullLink(String url, String urlStart, String urlStop) {
 		@Override
 		protected void onPostExecute(Integer result)
 		{
+			Log.v(TAG, "in on PostExecute");
 			indicator=true;
 			dialog.dismiss();
 			return;
